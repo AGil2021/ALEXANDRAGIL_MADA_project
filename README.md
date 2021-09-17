@@ -1,3 +1,7 @@
+# Project Proposal - Part 1
+
+The project proposal[Proposal.Rmd] is located in manuscript folder on Products folder. 
+
 # Overview
 
 A template file and folder structure for a data analysis project/paper done with R/Rmarkdown/Github. 
