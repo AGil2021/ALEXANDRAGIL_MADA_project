@@ -26,7 +26,7 @@ library(here) #to set paths
 # Project Question
 This project has a main objective to examinate the relationship between sex (Female or Male) with the 15 leading causes of death by all states in the Unites States. 
 The data was obtained from DATA.GOV; it has provisional estimates of death rates. Estimates are presented for each of the 15 leading causes of death plus estimates for deaths attributed to drug overdose, falls (for persons aged 65 and over), human immunodeficiency virus (HIV) disease, homicide, and firearms-related deaths.
-https://catalog.data.gov/dataset/nchs-vsrr-quarterly-provisional-estimates-for-selected-indicators-of-mortality
+[dataset](https://catalog.data.gov/dataset/nchs-vsrr-quarterly-provisional-estimates-for-selected-indicators-of-mortality)
 - The 15 leading causes of death are:
   Alzheimer disease, Cancer, Chronic liver disease and cirrhosis, Chronic lower respiratory disease, COVID-19 (starting in 2020), Diabetes, Drug overdose, Falls (age 65 and over), Firearm-related injury, 
   Heart disease, HIV, Homicide, Hypertension, Influenza and pneumonia, Kidney disease, Parkinson disease, Pneumonitis due to solids and liquids, Septicemia, Stroke, Suicide, and Unintentional injuries.
