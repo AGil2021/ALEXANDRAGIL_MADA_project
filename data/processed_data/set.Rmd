@@ -1,0 +1,57 @@
+---
+title: "EDA-Mortality"
+output: html_document
+---
+This section of the project is the exploratory data analysis (EDA). It will be save at processed_data as Rdm file. 
+
+#load needed packages.
+```{r}
+install.packages("dplyr")
+install.packages("tidyverse")
+library(readxl) #for loading Excel files
+library(dplyr) #for data processing
+library(here) #to set paths
+library(tidyverse)
+```
+#Path to data
+```{r}
+data_location <- here::here("data","raw_data","NCHS_-_VSRR_Quarterly_provisional_estimates_for_selected_indicators_of_mortality.csv")
+rawdata <- read.csv(data_location)
+```
+# What is in my dataset?
+```{r}
+dplyr::glimpse(rawdata)
+```
+# Cleaning the dataset
+The cleaning process will be trough a filter because the dataset includes Time Period for the whole year and for every quarter (3-month period), the I decided to study the quarters because there is causes of death that are "seasonal" as influenza.
+Also is important take in consideration that there are some Causes of dead that are depending of the age as Alzheimer disease, or disease like COVID-19 that started in 2020. I will removed "NA" values in ordert to work withthe data set. 
+```{r}
+set <- rawdata %>%
+    filter( Time.Period == "3-month period" , Rate.Type== "Crude")
+set
+
+Q1<-set%>%
+  filter(Year.and.Quarter=="2020 Q1") %>%
+ select(Year.and.Quarter, Cause.of.Death, Overall.Rate )
+
+Q1
+```
+
+```{r}
+
+set %>%
+    group_by(Cause.of.Death)%>%
+    filter(!Overall.Rate== "NA")
+set
+    
+```
+#Visualization
+```{r}
+plot1 <- ggplot(data=Q1) +
+  stat_summary( mapping = aes(x= Cause.of.Death, y=Overall.Rate), 
+                fun= median)
+            
+plot1 + coord_flip()
+```
+#### I'm facing some issues in the cleaning process, my basic idea is removed the NA values for diseases that are determinating by the age as Alzheimer disease, or disease like COVID-19 that started in 2020...
+ 
