@@ -1,0 +1,61 @@
+---
+title: "COVID"
+output: html_document
+---
+This section of the project is the exploratory data analysis (EDA). It will be save at processed_data as Rdm file, as COVID.
+
+
+#load needed packages.
+```{r}
+
+install.packages("dplyr")
+install.packages("tidyverse")
+library(dplyr) #for data processing
+library(here) #to set paths
+library(tidyverse)
+```
+
+#Path to data
+```{r}
+data_location <- here::here("datacovid","raw_data","Provisional_COVID-19_Deaths_by_Sex_and_Age.csv")
+rawdata <- read.csv(data_location)
+```
+# What is in my dataset?
+```{r}
+dplyr::glimpse(rawdata)
+```
+# Cleaning the dataset
+The study is focus in Georgia 
+```{r}
+GA<-rawdata %>%
+        filter(State=="Georgia",Group=="By Total", !Sex=="All Sexes")%>%
+        select(-"Data.As.Of", -"Group", -"Year", -"Month", -"Footnote")
+GA
+```
+#Save GA data 
+```{r}
+# The data will be saved as rds
+
+# Data location 
+save_data_location <- here::here("datacovid", "processed_data","GA.rds")
+
+saveRDS(GA, file = save_data_location )
+```
+# Join datasets
+```{r}
+# now it time to join the dataset 2, which shows the comorbidites
+
+#load data set about comorbities
+data_location<- here::here("datacovid", "raw_data","comorbidities.csv" )
+comorbidities <- read.csv(data_location)
+#rename the column name "sex" in comorbidities dataset for "Sex"
+colnames(comorbidities)[colnames(comorbidities)=="sex"]<-"Sex"
+
+# The data will be join by sex
+jdata<- left_join(GA , comorbidities, by="Sex" )
+
+View(jdata)
+```
+#Dr Handel, can you give me some advise about the better way to joint those data sets?
+
+
