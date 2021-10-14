@@ -1,6 +1,6 @@
 # Project Proposal - Part 1
 
-The project proposal[Proposal.Rmd] is located in manuscript folder on Products folder. 
+The project proposal[Proposal_COVID.Rmd] is located in manuscript folder on Products folder. 
 
 # Overview
 
@@ -12,8 +12,9 @@ This is a template for a data analysis project using R, Rmarkdown (and variants,
 
 # Template structure
 
-* All data goes into the subfolders inside the `data` folder.
+* All data goes into the subfolders inside the `datacovid` folder.
 * All code goes into the `code` folder or subfolders.
+* Part 2 of the project (COVID.Rmd) goes into `processing_code` file into `code`
 * All results (figures, tables, computed values) go into `results` folder or subfolders.
 * All products (manuscripts, supplement, presentation slides, web apps, etc.) go into `products` subfolders.
 * See the various `readme.md` files in those folders for some more information.

@@ -37,7 +37,7 @@ GA
 # The data will be saved as rds
 
 # Data location 
-save_data_location <- here::here("datacovid", "processed_data","GA.rds")
+save_data_location <- here::here("code", "processing_code","GA.rds")
 
 saveRDS(GA, file = save_data_location )
 ```
