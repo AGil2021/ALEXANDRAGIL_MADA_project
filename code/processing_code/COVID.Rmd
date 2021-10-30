@@ -24,14 +24,48 @@ rawdata <- read.csv(data_location)
 ```{r}
 dplyr::glimpse(rawdata)
 ```
-# Cleaning the dataset
-The study is focus in Georgia 
+#Statistical Summary
 ```{r}
-GA<-rawdata %>%
-        filter(State=="Georgia",Group=="By Total", !Sex=="All Sexes")%>%
-        select(-"Data.As.Of", -"Group", -"Year", -"Month", -"Footnote")
-GA
+summary(rawdata)
+
+table(rawdata$Year)
+table(rawdata$State)
+table(rawdata$Sex)
+table(rawdata$`Age Group`)
+
+unique(rawdata$State)
 ```
+# Filter Data
+#The maximum values are too large in comparison with the median that corresponds to 50% of the data, which generally oscillates around 0, for this reason, for a better visualization, a cut-off point was taken to filter the data
+```{r}
+newdata<- rawdata%>%
+          filter("COVID-19 Deeaths"< 400)
+glimpse(newdata)
+```
+#Plots and Tables
+```{r}
+bp <- ggplot(newdata, aes( x = `COVID 19 Deaths`)) + geom_histogram()
+
+bp
+```
+histo <- ggplot(newdata, aes( x = `COVID.19.Deaths`)) + geom_histogram()+
+        facet_grid(Sex ~ .)
+histo
+
+bp1 <- ggplot(newdata, aes(x="Pneumonia.Deaths ")) + geom_histogram()
+
+bp1
+
+bp2 <- ggplot(newdata, aes(x="Influenza Deaths"))+ geom_histogram()
+
+bp2
+
+bp3 <- ggplot(newdata, aes(x="Pneumonia and COVID-19 Deaths"))+ geom_histogram()
+
+bp3
+
+```
+
 #Save GA data 
 ```{r}
 # The data will be saved as rds
@@ -41,21 +75,5 @@ save_data_location <- here::here("code", "processing_code","GA.rds")
 
 saveRDS(GA, file = save_data_location )
 ```
-# Join datasets
-```{r}
-# now it time to join the dataset 2, which shows the comorbidites
-
-#load data set about comorbities
-data_location<- here::here("datacovid", "raw_data","comorbidities.csv" )
-comorbidities <- read.csv(data_location)
-#rename the column name "sex" in comorbidities dataset for "Sex"
-colnames(comorbidities)[colnames(comorbidities)=="sex"]<-"Sex"
-
-# The data will be join by sex
-jdata<- left_join(GA , comorbidities, by="Sex" )
-
-View(jdata)
-```
-#Dr Handel, can you give me some advise about the better way to joint those data sets?
 
 

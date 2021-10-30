@@ -1,6 +1,6 @@
 ---
 title: "Proposal Project - Part1"
-subtitle: "Mortality due to positive COVID-19 Cases and its relatioship with Comorbidities in GA"
+subtitle: "Mortality due to positive COVID-19 Cases and its relatioship with Pneumonia and Influenza"
 author: Alexandra Gil
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
@@ -24,9 +24,8 @@ library(here) #to set paths
 ```
 
 # Project Objective
-Since there are different thoughs about the relationship between preexisting condition (comorbidities) and COVI-19 deaths, this study will be analyzed this relationship in cases occurred in Georgia. The main idea is combined two datasets:
-1. Provisional COVID-19 Deaths by Sex and Age (CDC data updated October 6, 2021). The dataset shows the deaths involving coronavirus disease 2019 (COVID-19), pneumonia, and influenza reported to NCHS by sex, age group, and jurisdiction of occurrence.
-2. Comorbidities (DPH data, These data represent confirmed cases of COVID-19 reported to the Georgia Department of Public Health (DPH) as of 10/8/2021, 2:50:17 PM.). The dataset shows the comorbidity,	sex,	ethnicity,	race,	cases, and	deaths in Georgia.
+COVID-19 and Influenza are both contagious respiratory illnesses, meaning they affect lungs and breathing. Therefore, Pneumonia is a concern between medical community, as a result of  getting positive result for COVID-19 and/or influenza. This study will analyze COVID-19 deaths and its relationship with Pneumonia and Influenza.
+The data base that will be used is Provisional COVID-19 Deaths by Sex and Age (CDC data updated October 6, 2021). The dataset shows the deaths involving coronavirus disease 2019 (COVID-19), pneumonia, and influenza reported to NCHS by sex, age group, and jurisdiction of occurrence.
 
 # Raw Data
 ```{r}
