@@ -4,12 +4,10 @@ output: html_document
 ---
 This section of the project is the exploratory data analysis (EDA). It will be save at processed_data as Rdm file, as COVID.
 
-
-#load needed packages.
-```{r}
-
 install.packages("dplyr")
 install.packages("tidyverse")
+#load needed packages.
+```{r}
 library(dplyr) #for data processing
 library(here) #to set paths
 library(tidyverse)
@@ -77,10 +75,6 @@ bp3
 fit <- lm(`COVID.19.Deaths`~ Sex+`Age.Group`+State + Year , data=newdata )
 
 summary(fit)
-
-
-
-
 
 layout(matrix(c(1,2,3,4),2,2)) 
 
