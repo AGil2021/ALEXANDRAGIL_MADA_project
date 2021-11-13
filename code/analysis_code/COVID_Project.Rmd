@@ -21,9 +21,6 @@ library(tree)
 ```{r}
 data_location <- here::here("datacovid","raw_data","Provisional_COVID-19_Deaths_by_Sex_and_Age.csv")
 
-#rawdata <- read_csv("C:/Users/karol/Downloads/Provisional_COVID-19_Deaths_by_Sex_and_Age.csv", 
-                                                       #col_types = cols(Year = col_factor(), 
-                                                                        #Month = col_character(), #Footnote = col_character()))
 
 rawdata <- read.csv(data_location)
 
