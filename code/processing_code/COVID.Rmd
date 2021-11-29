@@ -26,6 +26,7 @@ Footnote = col_character())
 # What is in my dataset?
 ```{r}
 dplyr::glimpse(rawdata)
+skimr::skim(rawdata)
 ```
 #Statistical Summary
 ```{r}

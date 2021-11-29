@@ -4,7 +4,6 @@ author: "Alexandra Gil"
 date: "11/12/2021"
 output: html_document
 ---
-This section of the project is the exploratory data analysis (EDA). It will be save at processed_data as Rdm file, as COVID.
 
 #load needed packages.
 ```{r}
@@ -113,6 +112,13 @@ bp2
 bp3 <- ggplot(newdata, aes(x=`Pneumonia.and.COVID.19.Deaths`))+ geom_histogram()
 
 bp3
+
+# The data will be saved as rds
+
+# Data location 
+save_data_location <- here::here("products", "plots","bp.png")
+
+saveRDS(bp, file = save_data_location )
 
 ```
 
