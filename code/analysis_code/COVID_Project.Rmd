@@ -13,6 +13,8 @@ library(tidyverse)
 library(lmtest) #assumptions validation
 library(MASS) # for box-cox transformation
 library(tree)
+library(DT)
+library(kableExtra)
 ```
 
 # Path to data
@@ -38,12 +40,33 @@ dplyr::glimpse(rawdata)
 ```{r}
 summary(rawdata)
 
-table(rawdata$Year)
-table(rawdata$State)
-table(rawdata$Sex)
-table(rawdata$'Age.Group')
+table_year = table(rawdata$Year)
+table_year %>%
+  kbl() %>%
+  kable_styling()
+table_file = here("products","plots", "table_year.rds")
+saveRDS(table_year, file = table_file)
 
-unique(rawdata$State)
+table_states =table(rawdata$State)
+table_states %>%
+  kbl() %>%
+  kable_styling()
+table_file = here("products","plots", "table_states.rds")
+saveRDS(table_states, file = table_file)
+
+table_sex = table(rawdata$Sex)
+table_sex %>%
+  kbl() %>%
+  kable_styling()
+table_file = here("products","plots", "table_sex.rds")
+saveRDS(table_sex, file = table_file)
+
+table_age = table(rawdata$`Age Group`)
+table_age %>%
+  kbl() %>%
+  kable_styling()
+table_file = here("products","plots", "table_age.rds")
+saveRDS(table_age, file = table_file)
 ```
 
 # Correlations
@@ -55,11 +78,17 @@ Considering that the database has records of covid deaths, pneumonia deaths and 
 
 cor(rawdata$'COVID.19.Deaths', rawdata$'Pneumonia.Deaths', use="complete.obs")
 
-cor(rawdata$'COVID.19.Deaths', rawdata$'Influenza.Deaths' , use="complete.obs")
+cor(rawdata$'COVID.19.Deaths', rawdata$'Influenza.Deaths', use="complete.obs")
 
 cor(rawdata$'Pneumonia.Deaths', rawdata$'Influenza.Deaths', use="complete.obs")
 
 ```
+
+| Correlations | Covid 19 deaths | Pneumonia deaths | Influenza deaths  |
+|-------------------|-------------|---------------|--------------|
+| Covid 19 deaths  |  1  |  0.9969512          | 0.8501622        |
+| Pneumonia deaths  | 0.9969512  | 1         | 0.8667544        |
+| Influenza deaths | 0.8501622 | 0.8667544  | 1       |
 
 In this case, it was observed that the correlations are positive and greater than 0.5, therefore, it could be said that there is a direct relationship between the variables, the higher the number of deaths due to covid, the higher the number of deaths due to pneumonia and influenza.
 
@@ -94,31 +123,33 @@ glimpse(newdata)
 
 ```{r}
 bp <- ggplot(newdata, aes( x = `COVID.19.Deaths`)) + geom_histogram()
-
 bp
+figure_file = here("products","plots","bp.png")
+ggsave(filename = figure_file, plot=bp) 
+
 
 histo <- ggplot(newdata, aes( x = `COVID.19.Deaths`)) + geom_histogram()+
         facet_grid(Sex ~ .)
 histo
+figure_file = here("products","plots","histo.png")
+ggsave(filename = figure_file, plot=histo) 
+
 
 bp1 <- ggplot(newdata, aes(x=`Pneumonia.Deaths`)) + geom_histogram()
-
 bp1
+figure_file = here("products","plots","bp1.png")
+ggsave(filename = figure_file, plot=bp1) 
 
 bp2 <- ggplot(newdata, aes(x=`Influenza.Deaths` ))+ geom_histogram()
-
 bp2
+figure_file = here("products","plots","bp2.png")
+ggsave(filename = figure_file, plot=bp2) 
+
 
 bp3 <- ggplot(newdata, aes(x=`Pneumonia.and.COVID.19.Deaths`))+ geom_histogram()
-
 bp3
-
-# The data will be saved as rds
-
-# Data location 
-save_data_location <- here::here("products", "plots","bp.png")
-
-saveRDS(bp, file = save_data_location )
+figure_file = here("products","plots","bp3.png")
+ggsave(filename = figure_file, plot=bp3) 
 
 ```
 
@@ -131,7 +162,10 @@ summary(fit)
 
 layout(matrix(c(1,2,3,4),2,2))  
 
-plot(fit)
+plot1<-plot(fit)
+
+figure_file = here("products","plots","plot1.png")
+ggsave(filename = figure_file, plot=plot1) 
 
 ```
 
@@ -218,7 +252,7 @@ treeregresion <- tree::tree(
 
 summary(treeregresion)
 
-par(mar = c(1,1,1,1)) # Chart margins
+par(mar = c(1,1,1,1)) # plot margins
 plot(x = treeregresion, type = "proportional") # Decision Tree Árbol (heterogeneity)
 text(x = treeregresion, splits = TRUE, pretty = 0, cex = 0.8, col = "firebrick") # Tree Label
 
@@ -255,5 +289,62 @@ test_rmse1   <- sqrt(mean((predictions1 - testset$coviddeats)^2, na.rm=T))
 paste("Final tree test error:", round(test_rmse1,2))
 ```
 
+#Machine learning using newdata
+```{r}
 
+machinedata <- newdata
+colnames(machinedata)[10] <- "coviddeats"
+colnames(machinedata)[9] <- "age"
+
+set.seed(123) # 
+sampledata <- sample(1:nrow(machinedata), size = nrow(machinedata)/2) # sample
+trainset <- machinedata[sampledata,] # train data
+testset <- machinedata[-sampledata,] # test data
+
+
+set.seed(123) # seed
+treeregresion <- tree::tree(
+        formula = as.numeric(coviddeats)~ as.factor(Sex)+as.factor(age), # Response variables and predictors variables
+        data = trainset, # Data that will be used for the model creation 
+        split = "deviance", # Deviation
+        mincut = 20, # Minimum number of observations for division to occur
+        minsize = 50 # Minimum number of observation for ramification
+)
+
+summary(treeregresion)
+
+par(mar = c(1,1,1,1)) # plot margins
+plot(x = treeregresion, type = "proportional") #  # Decision Tree Árbol (heterogeneity)
+text(x = treeregresion, splits = TRUE, pretty = 0, cex = 0.8, col = "firebrick") #  Tree Label
+
+regression_tree <- tree( 
+                    formula = as.numeric(coviddeats)~ as.factor(Sex)+as.factor(age),
+                    data    = trainset,
+                    split   = "deviance",
+                    mincut  = 1,
+                    minsize = 2,
+                    mindev  = 0
+                  )
+
+set.seed(500) 
+cv_arbol <- cv.tree(regression_tree, K = 5) # cross crossing validation
+cv_arbol
+
+
+size <- rev(cv_arbol$size)[which.min(rev(cv_arbol$dev))] # Looking for the size
+paste("Optimal size of the number of terminal nodes:", size)
+
+final_tree <- prune.tree(
+                  tree = regression_tree, #Tree size
+                  best = size 
+               )
+
+predictions <- predict(regression_tree, newdata = testset)
+test_rmse    <- sqrt(mean((predictions - testset$coviddeats)^2,na.rm=TRUE))
+paste("Initial tree test error:", round(test_rmse,2))
+
+predictions1 <- predict(final_tree, newdata = testset)
+test_rmse1   <- sqrt(mean((predictions1 - testset$coviddeats)^2, na.rm=T))
+paste("Final tree test error:", round(test_rmse1,2))
+```
 
