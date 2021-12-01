@@ -113,7 +113,7 @@ _Summarize what you did, what you found and what it means._
 _Discuss what you perceive as strengths and limitations of your analysis._
 
 ## Conclusions
-_What are the main take-home messages?_
+Mortality due to COVID-19 are conditioning to age and sex. There is a strong relationship between COVID-19 mortality and Pneumonia.
 
 _Include citations in your Rmd file using bibtex, the list of references will automatically be placed at the end_
 
