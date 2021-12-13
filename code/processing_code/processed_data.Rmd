@@ -1,0 +1,122 @@
+---
+title: "processed_data"
+output: html_document
+---
+
+In this section you will find the data exploration and clean-up for furute analysis.
+
+```{r}
+library(dplyr) #for data processing
+library(here) #to set paths
+library(tidyverse)
+```
+
+# Path to data
+```{r}
+data_location <- here::here("Data","raw_data","Provisional_COVID-19_Deaths_by_Sex_and_Age.csv")
+rawdata <- read.csv(data_location)
+```
+# What is in my data?
+```{r}
+#attach(rawdata)
+tableRawData<- skimr::skim(rawdata)
+tableRawData
+table_file = here("products","graphs", "tableRawData.rds")
+saveRDS(tableRawData, file = table_file)
+
+```
+
+This exploration shows an important amount of missing data in numerical variables, such as COVID.19.Deaths, Total.Deaths, Pneumonia.Deaths, Pneumonia.and.COVID.19.Deaths, Influenza.Deaths, and Pneumonia..Influenza..or.COVID.19.Deaths. Is important analysis is the amount of missing values are associated with other factors, such us age, state, sex, and year, before take a decsion about those values.
+```{r}
+# 1. Clean-up and rename variables
+
+dt<-rawdata %>%
+          dplyr::select(-c(Data.As.Of, Footnote)) %>%
+    
+          rename(age_group = Age.Group, startdate= Start.Date, endate = End.Date, 
+          COVID19_d =   COVID.19.Deaths, total_d = Total.Deaths, pneum_d = Pneumonia.Deaths,
+          flu_d = Influenza.Deaths, pfc_d = Pneumonia..Influenza..or.COVID.19.Deaths,
+          pc_d = Pneumonia.and.COVID.19.Deaths)
+dt
+```
+```{r}
+# 2. Plots
+
+plot1<-ggplot(data= dt, mapping = aes(x= COVID19_d, y=age_group)) +
+  geom_boxplot() #Shows that young ages didn't die due COVID-19
+plot1
+figure_file = here("products","graphs","plot1.png")
+ggsave(filename = figure_file, plot=plot1) 
+
+plot2<-ggplot(data= dt, mapping = aes(x= pneum_d, y=age_group)) +
+  geom_boxplot() #Shows that young ages didn't die due Pneumonia
+plot2
+figure_file = here("products","graphs","plot2.png")
+ggsave(filename = figure_file, plot=plot2) 
+
+
+plot3<-ggplot(data= dt, mapping = aes(x= flu_d, y=age_group)) +
+  geom_boxplot() #Shows less deaths compared with P
+plot3
+figure_file = here("products","graphs","plot3.png")
+ggsave(filename = figure_file, plot=plot3) 
+
+plot4<-ggplot(data= dt, mapping = aes(x= pfc_d, y=age_group)) +
+  geom_boxplot() #Shows that young ages area didn't die due COVID-19
+plot4
+figure_file = here("products","graphs","plot4.png")
+ggsave(filename = figure_file, plot=plot4) 
+
+plot5<-ggplot(data= dt, mapping = aes(x= COVID19_d, y=State)) +
+  geom_boxplot()  
+plot5
+figure_file = here("products","graphs","plot5.png")
+ggsave(filename = figure_file, plot=plot5) 
+
+plot6<-ggplot(data= dt, mapping = aes(x= COVID19_d, y=Sex)) +
+  geom_boxplot() # There were more male deaths than female deaths
+plot6
+figure_file = here("products","graphs","plot6.png")
+ggsave(filename = figure_file, plot=plot6)
+
+table_year <- table(dt$Group, dt$Year )
+table_year
+table_file = here("products","graphs", "table_year.rds")
+saveRDS(table_year, file = table_file)
+
+```
+This data set can be analyzed using totals or using categories, for example All Sexes or Male and Female, or By Month, Year or total. To answer the project question will be more beneficial no use totals.
+```{r}
+# 3. Filters 
+
+dt1 <- dt%>% filter(!age_group == "All Ages" & !age_group == "0-17 years" & 
+                   !age_group == "1-4 years" & !age_group == "15-24 years" & 
+                   !age_group == "5-14 years" & !age_group == "Under 1 year" & 
+                   !age_group == "18-29 years")
+                     
+
+dt1 <- dt1%>% filter(!State == "United States")
+dt1 <- dt1%>% filter(Group == "By Year")
+dt1 <- dt1%>% filter(!Sex=="All Sexes") 
+#dt1 <- dt1%>% filter(!pc_d == "NA")
+dt1 <- dt1%>% filter(!pc_d== 0)
+dt1 <- dt1%>% filter(pc_d >100)
+
+#view(dt1)
+skimr::skim(dt1)
+```
+#Save GA data 
+```{r}
+# The data will be saved as rds
+
+# Data location 
+save_data_location <- here::here("code", "processing_code","dt1.rds")
+
+saveRDS(dt1, file = save_data_location )
+```
+
+
+
+  
+
+

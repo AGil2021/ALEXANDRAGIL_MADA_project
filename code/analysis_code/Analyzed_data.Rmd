@@ -1,0 +1,168 @@
+---
+title: "analysis_data"
+output: html_document
+---
+The data set that will be use at this section will be dt2 (from processing_code file)
+```{r}
+library(dplyr) #for data processing
+library(here) #to set paths
+library(tidyverse)
+library(tidymodels)  # for the parsnip package, along with the rest of tidymodels
+library(readr)       # for importing data
+library(lmtest) #assumptions validation
+install.packages("broom.mixed")
+library(broom.mixed) # for converting bayesian models to tidy tibbles
+install.packages("dotwhisker")
+library(dotwhisker)  # for visualizing regression results
+library(MASS) # for box-cox transformation
+library(recipes)
+library(parsnip)
+library(dials)
+library(tune)
+library(yardstick)
+library(rsample)
+library(workflows)
+library(rpart)
+library(rpart.plot)
+library(glmnet)
+library(ranger)
+library(vip)
+library(tree)
+```
+# Path to data
+```{r}
+data_location <- here::here("code","processing_code", "dt1.rds")
+dt1 <- read_rds(data_location)
+```
+# Modeling
+The model propose is a multiple linear regression model.
+```{r}
+#Outcome variable = COVID-19 and Pneumonia Deaths (pc_d)
+#Independent variables = Sex, Group Age, State
+
+#Build a Model
+
+fit <- lm(pc_d~ age_group + State + Sex, data=dt1 )
+
+lmtable<-summary(fit)
+lmtable
+table_file = here("products","graphs", "lmtable.rds")
+saveRDS(lmtable, file = table_file)
+
+
+layout(matrix(c(1,2,3,4),2,2)) 
+plot(fit) 
+
+
+#figure_file = here("products","graphs","modelplot1.png")
+#ggsave(filename = figure_file, plot=modelplot1) 
+
+
+
+```
+It is observed then that in spite of having a relatively good coefficient of determination, there are problems related to the assumptions, and for this reason the box-cox transformation is used.
+
+# Box-cox transformation
+
+```{r}
+
+bm=boxcox(as.numeric(dt1$pc_d) ~ dt1$age_group+ dt1$State + dt1$Sex )
+
+lambda=bm$x[which(bm$y==max(bm$y))]
+
+fit2 <- lm(pc_d^lambda~ age_group+ + State + Sex, data = dt1)
+
+table_Boxcox<-summary(fit2)
+table_Boxcox
+table_file = here("products","graphs", "table_Boxcox.rds")
+saveRDS(table_Boxcox, file = table_file)
+```
+After performing the box-cox transformation, the model is run again and an improvement in the coefficient of determination is observed and at the same time, graphically and analytically, it can be said that the assumptions of the model are being fulfilled (except for the autocorrelation assumption, but this could possibly be due to the nature of the data or the data collection). The assumptions were validated through tests such as shapiro wilks for normality, reset for linearity (although it is not very common to evaluate this assumption through an analytical test), Breusch-Pagan for the homogeneity of variance assumption and Durbin-Watson for the autocorrelation assumption.
+
+# Assumption validation
+
+```{r}
+#lineality 
+resettest(fit2)
+
+# variance 
+bptest(fit2)
+
+# autocorrelation
+dwtest(fit2,alternative = "two.sided")
+
+# normality
+shapiro.test(fit2$residuals)
+
+```
+# ANOVA
+
+In this case, with a significance level of 0.05, non significant differences are observed between 
+the age groups and state and sex.
+
+```{r}
+table_Anova<-anova(fit2)
+table_Anova
+table_file = here("products","graphs", "table_Anova.rds")
+saveRDS(table_Anova, file = table_file)
+
+```
+
+#### MACHINE LEARNING ####
+```{r}
+machinedata <- dt1
+colnames(machinedata)[10] <- "coviddeats"
+colnames(machinedata)[9] <- "age"
+
+set.seed(123) # 
+sampledata <- sample(1:nrow(machinedata), size = nrow(machinedata)/2) # sample
+trainset <- machinedata[sampledata,] # train data
+testset <- machinedata[-sampledata,] # test data
+
+
+set.seed(123) # seed
+treeregresion <- tree::tree(
+        formula = as.numeric(pc_d)~ as.factor(Sex)+as.factor(age_group), # Response variables and predictors variables
+        data = trainset, # Data that will be used for the model creation 
+        split = "deviance", # Deviation
+        mincut = 20, # Minimum number of observations for division to occur
+        minsize = 50 # Minimum number of observation for ramification
+)
+
+summary(treeregresion)
+
+par(mar = c(1,1,1,1)) # plot margins
+plot(x = treeregresion, type = "proportional") #  # Decision Tree (heterogeneity)
+text(x = treeregresion, splits = TRUE, pretty = 0, cex = 0.8, col = "firebrick") #  Tree Label
+
+regression_tree <-  tree::tree( 
+                    formula = as.numeric(pc_d)~as.factor(Sex)+as.factor(age_group),
+                    data    = trainset,
+                    split   = "deviance",
+                    mincut  = 1,
+                    minsize = 2,
+                    mindev  = 0
+                  )
+
+set.seed(500) 
+cv_arbol <- cv.tree(regression_tree, K = 5) # cross crossing validation
+cv_arbol
+
+
+size <- rev(cv_arbol$size)[which.min(rev(cv_arbol$dev))] # Looking for the size
+paste("Optimal size of the number of terminal nodes:", size)
+
+final_tree <- prune.tree(
+                  tree = regression_tree, #Tree size
+                  best = size 
+               )
+
+predictions <- predict(regression_tree, newdata = testset)
+test_rmse    <- sqrt(mean((predictions - testset$coviddeats)^2,na.rm=TRUE))
+paste("Initial tree test error:", round(test_rmse,2))
+
+predictions1 <- predict(final_tree, newdata = testset)
+test_rmse1   <- sqrt(mean((predictions1 - testset$coviddeats)^2, na.rm=T))
+paste("Final tree test error:", round(test_rmse1,2))
+```
+
