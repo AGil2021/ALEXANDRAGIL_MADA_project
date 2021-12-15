@@ -1,0 +1,171 @@
+---
+title: "Ryan- Review"
+output: html_document
+---
+# Overview
+
+ Title of project: Mortality due to positive COVID-19 Cases and its relatioship with Pneumonia and Influenza
+
+ Name of project author(s): Alexandra Gil
+
+ Name of project reviewer: Ryan Grunert
+
+ # Specific project content evaluation
+
+
+ ## Background, Context and Motivation
+ How well is the context of the project described? Is a comprehensive background, including summary of previous/related work given? Is the project well placed into the context of existing work (including proper referencing of existing work). Is it clear why the project was undertaken and what new information it hopes to provide?
+
+ ### Feedback and Comments
+
+ The context of the project is described at a very basic level in the Manuscript file. There is no comprehensive background, no summary of previous/related work, and no references to that prior work. There is a simple justification by stating pneumonia is a medical concern for respiratory illnesses (COVID-19/Influenza), and nothing more. A suggestion would be to review the present literature on the topic and set the stage for why this analysis needs to occur, what the findings may tell us about the topic, and give some context for why you are using COVID-19 deaths. There is no abstract.
+
+ ### Summary assessment
+ * very poor contextualization and motivation
+
+
+ ## Question description
+ How well and clear are the question(s)/hypotheses the project aims to address described? Is it clear how the questions relate to the data?
+
+
+ ### Feedback and Comments
+
+ The objective of the question written was not very clear. It mentions that COVID-19 mortality will be analyzed and its relationship with pneumonia and influenza will assessed in adults over 25 years old. I am left with more questions, how will those relationships be analyzed? My suggestion would be to state specific variables and outcomes in this section in order to give the reader a clear idea of what you are planning to analyze. Will you be looking at pneumonia caused by influenza or COVID-19? Or comparing mortality rates between the three? 
+
+ ### Summary assessment
+ * question/hypotheses unclear
+
+
+ ## Data description
+ How well is the data overall described? Is the source provided? Is a codebook or other meta-information available that makes it clear what the data is? 
+
+ ### Feedback and Comments
+
+ The data is very briefly described in the manuscript, and an explanation for removing the 0-17 age group was stated. Code is written to show a glimpse of the data, but no other explanation is written for what the variables are, or which ones you will be focusing on when running the analysis. There is a source provided, but no metadata or codebook. Further explanations and descriptions are needed, and a metadata file would be useful for the reader.
+
+ ### Summary assessment
+ * source and overall structure of data poorly explained
+
+
+ ## Data wrangling and exploratory analysis
+ How well is the data cleaned/processed and explored? Are all steps reasonable and well explained? Are alternatives discussed and considered? Are meaningful exploratory results shown (e.g. in the supplementary materials)?
+
+ ### Feedback and Comments
+
+ The first bit of feedback I have is the organization of the project repository makes it difficult to determine where the data wrangling and exploratory analysis really occur. The README files don't mention where to start the analysis, so I opened both the processing script and analysis script.  Upon looking at the analysis script, you do more in-depth data processing and wrangling in that script, while the data saved from the processing script is never used again, so it begs the question of why was this script needed at all. The majority of the code in this script is in the analysis script.
+
+ The processing script loads the data successfully. The statistical summary section is not explained, and it is entirely up to the reader to infer what the data and tables mean. The 'Age Group' table does not work. The filter data section successfully filters the data based on covid-19 deaths. I'm not sure I understand the reason you stated for why you had to filter it. The graphs all work, but you do not state why you are graphing what you are graphing or label the graphs. It is up to the readers interpretation in this case. The model works, but again, not sure what I am looking at or why the diagnostic plots are all present. You then save the data as GA, but it doesn't look like the data was filtered to only show Georgia deaths. It is saved in the same folder as the processing script, but it is never used again in the project so this wasn't needed. 
+
+ My suggestions would be to first reorganize the repository so it is easy to understand where to go first for the section, and update the READMEs to explain directions. Extensive commenting is needed throughout the scripts in order for the reader to understand what is going on in the script and why you are doing what you are doing. Using variable names instead of "newdata" would be very helpful for the reader to understand what each function is calling. I suggest cutting some of the tables you have at the beginning, and only keeping what is necessary for the analysis. The graphs need labels, titles, and justifications for why you are graphing what you are graphing. The rest of the script isn't quite needed here, the saving section can be removed because that data is never used again. No conclusions were given regarding the data or explanations about the relationships between the variables.
+
+ ### Summary assessment
+ * major weaknesses in wrangling and exploratory component
+
+ ## Appropriateness of Analysis
+ Were the analysis methods appropriate for the data? Was the analysis done properly? Were different components of the analysis (e.g. performance measure, variable selection, data pre-processing, model evaluation) done in the best way possible and explained well?
+
+ ### Feedback and Comments
+
+ As a whole, the analysis is incomplete.
+
+ I cannot get the kableExtra package to work. I recieve this error:
+ Error: package or namespace load failed for ‘kableExtra’ in loadNamespace(j <- i[[1L]], c(lib.loc, .libPaths()), versionCheck = vI[[j]]): there is no package called ‘systemfonts’
+
+ The statistical summary section does not work because the package was not able to be loaded. Error:Error in kable_styling(.) : could not find function "kable_styling"
+
+ Your correlation section works, and you mention that there is a direct relationship between the variables. The table you have could be aligned so it is easier to read, or removed entirely as the code above has a section with all those numbers stated. You decide to filter the data to focus on people over 50, which is a new objective not stated elsewhere. I've never heard of the box-cox transformation and no other explanation is given about it other than "problems related to assumptions." The filtering works and so does the graphing, but they are the same graphs from the processing section and the only other aspect added is now you save them. The same model is present from the processing script.
+
+ The box-cox transformation doesn't work, error: Error in boxcox.default(as.numeric(newdata$COVID.19.Deaths) ~ newdata$Age.Group + : response variable must be positive
+
+ You then mention using four other tests, but the explanation you give is unclear about why you have to use these tests, or the transformation in the first place. You conclude that there is significant differences between age groups and the states, but the anova and previous four tests don't run because of the previous code. No other conclusion is given about the result in the project repo. 
+
+ The machine learning model you use is a regression tree. Your explanation doesn't quite justify using the model as all you have mentioned is it deals with "quantiative response variables." Tidymodels isn't used here, so the code is somewhat new to me, although no explanations exist that justify using the model, various sections of the code, or what the result means. The final result shows a tree with 2 end points and numbers, but isn't finished. It is the same with the second tree. The cross-validation setup results in a 50/50 train/test split as well, I suggest a 70/30 or 80/20 split for a more accurate result.
+
+ Overall, major revisions are needed here. My suggestion would be to go back and clarify the questions you are looking to answer by stating the variables you want to use, and build the analysis from there. Separating the exploratory analysis and statistical analysis would be helpful here too. I would also suggest looking at some other repositories to get ideas of how to structure the project, and possibly switching to tidymodels. I'm sure you could use a decision tree with this project, but some streamlining and clarification of the objective is needed for the reader to follow your analysis and intent. 
+
+
+ ### Summary assessment
+ * wrong/inadequate analysis
+
+ ## Presentation
+ How well are results presented? Are tables and figures easy to read and understand? Are the main figures/tables publication level quality? 
+
+ ### Feedback and Comments
+
+ The tables and figures are not easy to understand and not publication level quality. The ggplot figures could be significantly improved, this may a helpful resource (https://r-graphics.org/). I'm 
+ sure the tree figures could be improved as well, as the text runs off the screen and there are no captions or labels. Major revisions needed. 
+
+ ### Summary assessment
+ * results are poorly presented, hard to understand, poor quality
+
+
+ ## Discussion/Conclusions
+ Are the study findings properly discussed? Are strengths and limitations acknowledged? Are findings interpreted properly?
+
+ ### Feedback and Comments
+
+ The findings are not discussed. The majority of the manuscript file is leftover from the template, and the only conclusion found is the "significant differences" statement above. This needs to be added after the analysis is improved, as of right now both a discussion and a conclusion are absent.
+
+ ### Summary assessment
+ * major parts of discussion missing or wrong 
+
+
+ ## Further comments
+
+ Overall, significant structure is needed, as the project is incomplete.
+
+ First I suggest looking at some classmates' repositories to get ideas for how to structure the project. Remove any leftover files from the template and use only what you need. THe READMEs need to be updated in order to clarify where to start the analysis. Create some questions with specific variables that are present in your datasheet in order to get a clear idea of the exploratory and statistical analysis you are going to perform. From there, extensively comment on your code to understand every step you take, as sometimes the intent isn't communicated to the reader. Within the analysis, I can tell you have done your research on the tests you need for the process but the code doesn't work and the intent is lost in translation to the reader. A discussion and conclusion would be great as well, and fully filling out the manuscript file with your findings. I don't have much more to comment on, but I think the above would be a great start, then moving into processing and analyzing the data. 
+
+
+ # Overall project content evaluation
+ Evaluate overall features of the project  by filling in the sections below.
+
+ ## Structure
+ Is the project well structured? Are files in well labeled folders? Do files have reasonable names? Are all "junk" files not needed for analysis/reproduction removed? By just looking at files and folders, can you get an idea of how things fit together?
+
+ ### Feedback and Comments
+
+ The project is not well structured. The majority of the template files are still present, and the files don't have reasonable names (analysis script and processing script both contain same information). The READMEs don't contain enough information to guide the reader. Junk files are still present. The plots folder has tables and plots saved inside. I have an ok idea of how everything fits together, but only because I know how the template is originally organized. My suggestion would be to look at some fellow classmate's structure to get an idea of how to fit everything together in an organized fashion. Naming the different files "processing" or "analysis" would be helpful too, as having a similar name with "COVID" in the title makes looking at different scripts confusing.
+
+ ### Summary assessment
+ * poor and confusing structure
+
+ ## Documentation 
+ How well is the project documented? Are you able to understand each step of the whole analysis, each decision that was made, and each line of code? Is enough information provided as comments in code or as part of Rmd files? 
+
+ ### Feedback and Comments
+
+ The project was not documented that well. I wasn't able to understand each step of the whole analysis and why some decisions were made. The README files were not edited enough. The code within the scripts was not detailed enough to let the reader know why you were doing what you were doing. The decision tree at the end of the analysis had some documentation and commenting, but that was it. My suggestion would be to start by over-describing every step you do throughout the analysis through comments. You can always trim it down bit by bit, and it may seem excessive, but a lot of information can help the reader understand the code to recreate your analysis and gain insight into your project.
+
+ ### Summary assessment
+ * poorly documented
+
+
+ ## Reproducibility
+ Are all results fully reproducible? Is documentation provided which clearly explains how to reproduce things, and does it work without the need for any manual intervention? Are you able to re-run the whole analysis without having to do manual interventions/edits?
+
+ ### Feedback and Comments
+
+ All the results are not fully reproducible. The majority of the analysis script does not work, although the decision tree does at the end and the processing data section. There is not enough documentation provided to clearly reproduce everything. I tried manual intervention here and there in order try to get the code to run, but it did not work. My suggestion is further commenting out the code, and clearing your environment every now and then in order to re-run some of your code that doesn't take as long to run. Double-checking your progress here and there would be very useful.
+
+
+ ### Summary assessment
+ * major parts not reproducible 
+
+
+
+ ## Thoroughness
+ How thorough was the overall study? Were alternatives (e.g. different ways of processing the data or different models) considered? Were alternatives discussed? Were the questions/hypotheses fully and thoroughly addressed?
+
+ ### Feedback and Comments
+
+ Different alternative approaches were considered, but were not given an explanation for why they were used. The question wasn't fully addressed, and the study was not very thorough. I suggest following some of the earlier comments above about fixing the organization and moving into clearly stating objectives. An attempt was made to try different models and tests, but were not put into context. 
+
+ ### Summary assessment
+ * weak level of thoroughness
+
+ ## Further comments
+
+ This project topic is an interesting one, and you have good clean data. However, considerable organization and work needs to be done in order to successfully analyze the data and make it reproducible. 
+
+
